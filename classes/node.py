@@ -1,10 +1,11 @@
+
 class Node:
-    def __init__(self, id_, name, width, height):
+    def __init__(self, id_: int, name: str, width: int, height: int):
         self.name = name
         self.width = width
         self.height = height
         self.id = id_
-        self.is_terminal = name[0] == 'p'
+        self.is_terminal: bool = name[0] == 'p'
 
     def get_key(self):
         return tuple([self.id, self.name])
@@ -17,7 +18,7 @@ class Node:
 
     """Because we need to check only the names we don't want
     to check if they are equal based on id. """
-    def __eq__(self, other):
+    def __eq__(self, other: 'Node') -> bool:
         if isinstance(other, Node):
             return self.name == other.name
             # return self.__key() == other.__key()

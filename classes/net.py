@@ -1,10 +1,12 @@
 from colorama import Fore
+from typing import Set
+from classes.node import Node
 
 
 class Net:
-    def __init__(self, id_, nodes: set):
+    def __init__(self, id_: int, nodes: Set[Node]):
         self.id = id_
-        self.nodes: set = nodes
+        self.nodes = nodes
         self.net_degree = len(nodes)
 
     def __str__(self):
@@ -14,7 +16,7 @@ class Net:
         tmp_str += " }"
         return f"ID: {Fore.MAGENTA}{self.id}{Fore.RESET} {tmp_str}"
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Net') -> bool:
         if isinstance(other, Net):
             return self.id == other.id
             # return self.nodes == other.nodes
