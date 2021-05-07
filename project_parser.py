@@ -8,17 +8,15 @@ path_to_nodes = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data
 path_to_pl = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.pl"
 path_to_scl = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.scl"
 
-
-
 def get_node_stats():
 
     with open(path_to_nodes, 'r') as nodes_file:
-        nodes = nodes_file.readlines()#[7:]
+        nodes = nodes_file.readlines()[7:]
         for line in nodes:
             if re.match(re.compile(r"\s*[a|p]{1}[0-9]{1,2}\s*"), line):
                 i = 0
                 while i < len(line):
-                    node = 0
+
                     # Getting the names of the nodes
                     if re.match(re.compile(r"[a|p]"), line[i-2]) and re.match(re.compile(r"[0-9]"), line[i-1]) and re.match(re.compile(r"[0-9]|\s"), line[i]):
                         if re.match(re.compile(r"[0-9]"), line[i]):
