@@ -3,10 +3,10 @@ from node import *
 from design import *
 import re
 
-path_to_nets = r"C:\Users\lenovo\Desktop\Python_Project\design\design.nets"
-path_to_nodes = r"C:\Users\lenovo\Desktop\Python_Project\design\design.nodes"
-path_to_pl = r"C:\Users\lenovo\Desktop\Python_Project\design\design.pl"
-path_to_scl = r"C:\Users\lenovo\Desktop\Python_Project\design\design.scl"
+path_to_nets = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.nets"
+path_to_nodes = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.nodes"
+path_to_pl = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.pl"
+path_to_scl = r"C:\Users\lenovo\Desktop\Python_Project\Python-Uni-Project\data\design.scl"
 
 
 
