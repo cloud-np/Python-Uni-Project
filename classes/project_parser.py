@@ -1,4 +1,5 @@
 from classes.node import Node
+from typing import List
 
 
 class Parser:
@@ -26,3 +27,13 @@ class Parser:
                     Node(i, line_splited[0], int(line_splited[1]), int(line_splited[2]))
                 )
         return nodes_list
+
+    def parse_nodes_position(self) -> List[List[str]]:
+        pos_list: list[list[str]] = []
+        with open(self.path_to_pl, "r") as pos_file:
+            pos_lines = pos_file.readlines()[2:]
+
+            for line in pos_lines:
+                line_splited = line.split()
+                pos_list.append(line_splited[0:3])
+        return pos_list
