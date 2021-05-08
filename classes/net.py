@@ -1,23 +1,33 @@
 from colorama import Fore
-from typing import Set
+from typing import List
 from classes.node import Node
 
 
 class Net:
-    def __init__(self, id_: int, nodes: Set[Node]):
+    def __init__(self, id_: int, nodes_names: List[str]):
         self.id = id_
-        self.nodes = nodes
-        self.net_degree = len(nodes)
+        self.nodes_names = nodes_names
+        self.nodes: List[Node] = list()
+        self.net_degree = len(nodes_names)
 
-    def __str__(self):
+    def show_nodes(self):
         tmp_str = "nodes: { "
         for node in self.nodes:
             tmp_str += f"{Fore.GREEN}{node.name}{Fore.RESET}, "
         tmp_str += " }"
         return f"ID: {Fore.MAGENTA}{self.id}{Fore.RESET} {tmp_str}"
 
+    def get_key(self):
+        return self.id
+
+    def __key(self):
+        return self.id
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def __eq__(self, other: 'Net') -> bool:
-        if isinstance(other, Net):
+        if self.__class__ == other.__class__:
             return self.id == other.id
             # return self.nodes == other.nodes
         else:

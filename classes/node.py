@@ -25,7 +25,9 @@ class Node:
         return hash(self.__key())
 
     def __str__(self):
-        return f"id[{self.id}] {self.name}  w/h: ({self.width},{self.height}) pos: ({self.x}, {self.y})"
+        tmp_str = f"id[{self.id}] {self.name}  w/h: ({self.width},{self.height}) "
+        tmp_str += f"pos: ({self.x}, {self.y})" if self.x is not None else ""
+        return tmp_str
 
     """Because we need to check only the names we don't want
     to check if they are equal based on id. """
