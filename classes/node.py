@@ -1,12 +1,17 @@
+from typing import Any
+import random
+
 
 class Node:
     def __init__(self, id_: int, name: str, width: int, height: int):
         self.name = name
         self.width = width
         self.height = height
-        self.x = None
-        self.y = None
+        self.x: Any = None
+        self.y: Any = None
         self.id = id_
+        random.seed(sum([ord(ch) + 10 for ch in name]))
+        self.color = [random.randint(0, 255) for _ in range(3)]
         self.is_terminal: bool = name[0] == 'p'
 
     def set_position(self, x: int, y: int):
@@ -28,6 +33,27 @@ class Node:
         tmp_str = f"id[{self.id}] {self.name}  w/h: ({self.width},{self.height}) "
         tmp_str += f"pos: ({self.x}, {self.y})" if self.x is not None else ""
         return tmp_str
+
+    def serialize(self):
+        return {
+            'node_id': self.id,
+            'name': self.name,
+            'x': self.x,
+            'y': self.y,
+            'is_terminal': self.is_terminal
+        }
+
+    def __lt__(self, other: "Node"):
+        if self.__class__ == other.__class__:
+            return self.name < other.name
+        else:
+            return NotImplemented
+
+    def __gt__(self, other: "Node"):
+        if self.__class__ == other.__class__:
+            return self.name > other.name
+        else:
+            return NotImplemented
 
     """Because we need to check only the names we don't want
     to check if they are equal based on id. """

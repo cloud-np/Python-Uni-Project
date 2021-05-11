@@ -5,15 +5,23 @@ from typing import List, Set
 
 
 class Design:
-    def __init__(self, id_: int, num_pins: int, nets: Set[Net], nodes: List[Node], rows: List[Row]) -> None:
+    def __init__(self, id_: int, nets: Set[Net], nodes: List[Node], nodes_pos: List[List[str]], rows: List[Row]) -> None:
         self.id = id_
-        self.num_pins = num_pins
         self.nets = nets
         self.nodes = nodes
+        self.rows = rows
         self.c_nodes = [n for n in nodes if n.is_terminal is False]
         self.t_nodes = [n for n in nodes if n.is_terminal is True]
 
+        # This has to run first to assign the x and y to each node.
+        self.assign_pos_to_nodes(nodes_pos)
         self.assign_nodes_to_nets()
+        self.assign_nodes_to_rows()
+
+    # def serialize(self):
+    #     return {
+    #         'design_id': self.id,
+    #     }
 
     def find_node_by_name(self, name: str):
         """Find the a node by a given name.
@@ -32,8 +40,21 @@ class Design:
             raise ValueError(f"Could not find a node by name: {name}")
         return found_node
 
+    def assign_nodes_to_rows(self):
+        """Assign the nodes to the correct rows.
+
+        e.g:
+        Node(y=170)
+        (y - 100) // 10 = 7
+        Which is the 8th row so we can do:
+        rows[7].cells.append(node)
+        """
+        for cell in self.c_nodes:
+            self.rows[(cell.y - 100) // 10].cells.append(cell)
+
     def assign_nodes_to_nets(self):
-        [net.nodes.append(self.find_node_by_name(n_name)) for net in self.nets for n_name in net.nodes_names]
+        for net in self.nets:
+            net.set_nodes([self.find_node_by_name(n_name) for n_name in net.nodes_names])
 
     def assign_pos_to_nodes(self, pos: List[List[str]]) -> None:
         [self.find_node_by_name(name=arr[0]).set_position(int(arr[1]), int(arr[2])) for arr in pos]

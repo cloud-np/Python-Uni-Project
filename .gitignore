@@ -1,4 +1,4 @@
 .vscode/
-classes/__pycache__/
 main.py
-__pycache__/
+*/__pycache__/
+proj-venv/
