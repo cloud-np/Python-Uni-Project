@@ -5,18 +5,15 @@ async function setup() {
     .then(result => result.json())
     .then(result => {
         console.log(result);
-        // return receiveData(result);
+        return receiveData(result);
     })
     .catch(error => console.log(error));
 
     // let cnv = createCanvas(1550, 1536);
-    let cnv = createCanvas(1500, 300);
-    background(0, 10, 10);
-    cnv.parent('sketch-holder'); 
+    // let cnv = createCanvas(800, 800);
+    // background(0, 10, 10);
+    // cnv.parent('sketch-holder'); 
 
-    // setupEventHandlers();
-    // cnv.mousePressed(clickCell);
-    // DATA.setCanvas(cnv);
 }
 
 async function is_id_set(){
@@ -37,17 +34,25 @@ async function is_id_set(){
         .catch(error => console.log(error));
     }
 }
+function draw(){
+    stroke(25);
+    for (i = 0; i < height; i += DATA.rows.length) line(0, i, width, i);
+}
 
-function createBoard(board){
+function createBoard(rows){
 
-    let cnv = createCanvas(board.width * 1, board.height * 1);
-    cnv.parent('sketch-holder');
+    // let cnv = createCanvas(board.width * 1, board.height * 1);
+    let cnv = createCanvas(800, 800);
     background(0, 10, 10);
+    cnv.parent('sketch-holder');
 
     // Makes white lines
     stroke(25);
     let i ;
-    for (i = 0; i < height; i += 16) line(0, i, width, i);
+    for (i = 0; i < height; i += rows.length) line(0, i, width, i);
+    DATA.setCanvas(cnv);
+    setupEventHandlers();
+    cnv.mousePressed(clickCell);
 }
 
 
@@ -67,7 +72,7 @@ function setupEventHandlers(){
 
         if (e.keyCode === 13) {
             e.preventDefault();
-            if (this.value >= 0 && this.value < DATA.numNets) {
+            if (this.value >= 0 && this.value < DATA.nets.length) {
                 //console.log(this.value);
                 UIcontroll.showPickedNet(this.value * 1);
             }
@@ -78,8 +83,8 @@ function setupEventHandlers(){
         if(e.keyCode === 13){
             e.preventDefault();
             //                This will return the number of lines we have
-            if (this.value >= 0 && this.value <= DATA.board.height / 16)
-                UIcontroll.showCellsInSameLine(this.value * 16);
+            if (this.value >= 0 && this.value <= DATA.board.height / 8)
+                UIcontroll.showCellsInSameLine(this.value * 8);
         }
     });
     // Nodes
@@ -108,13 +113,9 @@ function setupEventHandlers(){
 function colorReset(){
     stroke('red');
     fill(20);
-    DATA.cellsArr.forEach(cell => {
+    DATA.nodes.forEach(cell => {
         cell.reColor();
     });
-}
-
-function draw() {
-    
 }
 
 function clickCell(){
@@ -145,10 +146,6 @@ function clickCell(){
 
 }
 
-function test() {
-
-}
-
 async function makeNets(){
 
     UIcontroll.showNetsInLabel();
@@ -156,7 +153,8 @@ async function makeNets(){
     UIcontroll.showNodesInLabel();
     // Each net gets assigned a unique color!
     let arr = [];
-    for (let i = 0; i <= DATA.numNets; i++) arr.push(new Net(i));
+    for (let i = 0; i <= DATA.numNets; i++)
+        arr.push(new Net(i));
     DATA.setNets(arr);
 }
 
@@ -172,7 +170,7 @@ const UIcontroll = {
     },
     showLinesInLabel: () => {
 
-        let num = DATA.board.height / 16;
+        let num = DATA.board.height / 8;
         $('#lines-note')[0].innerHTML = `<strong>NOTE</strong> total nets in this design: (${num})`;
     },
     showNodesInLabel: () => {
@@ -201,9 +199,9 @@ const UIcontroll = {
     },
 
     showPickedNet: id => {
-        fill(DATA.netsArr[id].getColor());
+        fill(DATA.nets[id].getColor());
 
-        DATA.cellsArr.forEach(cell => {
+        DATA.nodes.forEach(cell => {
             // If the cell contains the specific net (in his nets array) we asked for then it will return true
             isThereThatNet = cell.getNets().find(net => net === id);
             if (isThereThatNet) {
@@ -243,17 +241,17 @@ const DATA = {
     setCanvas: function (cnv) {
         this.canvas = cnv;
     },
-    setData  : function(board, numNets){
-        this.board    = board;
-        this.numRows  = board.width / 16;
-        this.numNets  = numNets;
+    setData  : function(rows, nodes, nets){
+        this.board = {'width': 800, 'height': 800} 
+        this.rows  = rows;
+        this.numNets = nets.length
+        this.numNodes = nodes.length
     },
-    setCells : function(cellsArr){
-        this.cellsArr = cellsArr;
-        this.numNodes = this.cellsArr.length;
+    setCells : function(nodes){
+        this.nodes = nodes;
     },
-    setNets  : function(netsArr){
-        this.netsArr  = netsArr;
+    setNets  : function(nets){
+        this.nets  = nets;
     }
 }
 
@@ -271,23 +269,20 @@ const Utils = {
     // this means when i use this. arrCells it created an attribute ti Window object
     // indead of the Utils object.
     makeCells: async function(data){
-
         let count = 0;
         let arr = [];
 
-        // We remove the first element of the data array with is the object of the board from php
-        // The sceond element is the number of nets we have
-        DATA.setData(data.shift(), data.shift());
+        DATA.setData(data.rows, data.nodes, data.nets);
         
         createBoard(DATA.board);
-        makeNets(DATA.numNets);
+        makeNets(data.nets);
 
         // Makes stroke atribute red
         // fill changes the color as well. 20 is a shade of grey
         // 0 is black 255 is white. 
         stroke('red');
         fill(20);
-        data.forEach(cell => {
+        data.nodes.forEach(cell => {
             arr[count++] = new Cell(cell.name, cell.x, cell.y, cell.width, cell.height, cell.nets, cell.isTerminal);
         });
 
@@ -300,9 +295,9 @@ const Utils = {
         let nNonTerminals = 0;
         DATA.cellsArr.forEach(cell => cell.isTerminal ? nTerminals++ : nNonTerminals++);
 
-        let netsArr = DATA.netsArr;
+        let netsArr = DATA.nets;
         
-        DATA.cellsArr.forEach(cell => {  
+        DATA.nodes.forEach(cell => {  
             cell.getNets().forEach(net => netsArr[net].setCell(cell));
         });
         
@@ -312,7 +307,7 @@ const Utils = {
         //console.log(biggestNet);
 
         let semiPerimeterSum = 0;
-        DATA.netsArr.forEach(net => {
+        DATA.nets.forEach(net => {
             const cells = net.getArrCells();
             if(cells.length > 0){
                 let maxX = cells[0].x, maxY = cells[0].y;
@@ -332,7 +327,7 @@ const Utils = {
         UIcontroll.showStas({
             nNodes: DATA.numNodes,
             nNets : DATA.numNets,
-            nRows : DATA.numRows,
+            nRows : 8,
             nTerminals   : nTerminals,
             nNonTerminals: nNonTerminals,
             biggestNet   : biggestNet,
@@ -349,7 +344,7 @@ const Utils = {
         
 
         // Find that line Y
-        DATA.cellsArr.forEach(cell => {
+        DATA.nodes.forEach(cell => {
             if (Math.abs(cell.y - y) < dif) {
                 dif = Math.abs(cell.y - y)
                 cellAtYlvl = cell;
@@ -357,14 +352,14 @@ const Utils = {
         });
 
         // Filter and get the line of cells we want
-        let difArr = DATA.cellsArr.filter(cell =>  cell.y === cellAtYlvl.y);
+        let difArr = DATA.nodes.filter(cell =>  cell.y === cellAtYlvl.y);
 
         return [difArr, cellAtYlvl];
         ////////////////////////////////
     },
 
     findNode: (cell_entered) => {
-        let cell = DATA.cellsArr.find(tempCell => tempCell.getName() === cell_entered);
+        let cell = DATA.nodes.find(tempCell => tempCell.getName() === cell_entered);
         console.log(cell);
         UIcontroll.colorCell(cell);
     },
@@ -372,11 +367,11 @@ const Utils = {
     findBorderCells: () => {
         let count = 0;
         let arr = [];
-        let height = DATA.board.height - 16;
+        let height = DATA.board.height - 8;
         let width = DATA.board.width * 1;
 
         fill(Utils.colors[6]);
-        DATA.cellsArr.forEach(cell => {
+        DATA.nodes.forEach(cell => {
             if (cell.x === 0 || cell.y === 0 || cell.y === height || (cell.x + cell.width) >= width) {
                 arr.push(cell);
                 count++;

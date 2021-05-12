@@ -34,13 +34,16 @@ class Node:
         tmp_str += f"pos: ({self.x}, {self.y})" if self.x is not None else ""
         return tmp_str
 
-    def serialize(self):
+    def serialize(self, nets):
+        nets = [net.id for net in nets if self.name in net.nodes_names]
+
         return {
             'node_id': self.id,
             'name': self.name,
             'x': self.x,
             'y': self.y,
-            'is_terminal': self.is_terminal
+            'isTerminal': self.is_terminal,
+            'nets': nets
         }
 
     def __lt__(self, other: "Node"):

@@ -1,5 +1,4 @@
 from classes.design import Design
-from random import randint
 import pygame as pg
 
 
@@ -62,8 +61,7 @@ class Visualizer:
             pg.display.update()
 
     def reveal_node_info(self, m_pos):
-        node = self.find_clicked_node(m_pos)
-
+        # node = self.find_clicked_node(m_pos)
         ...
 
     def find_clicked_node(self, m_pos):
