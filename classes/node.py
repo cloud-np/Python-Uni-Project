@@ -30,21 +30,9 @@ class Node:
         return hash(self.__key())
 
     def __str__(self):
-        tmp_str = f"id[{self.id}] {self.name}  w/h: ({self.width},{self.height}) "
+        tmp_str = f"Node[{self.id}] {self.name}  w/h: ({self.width},{self.height}) "
         tmp_str += f"pos: ({self.x}, {self.y})" if self.x is not None else ""
         return tmp_str
-
-    def serialize(self, nets):
-        nets = [net.id for net in nets if self.name in net.nodes_names]
-
-        return {
-            'node_id': self.id,
-            'name': self.name,
-            'x': self.x,
-            'y': self.y,
-            'isTerminal': self.is_terminal,
-            'nets': nets
-        }
 
     def __lt__(self, other: "Node"):
         if self.__class__ == other.__class__:

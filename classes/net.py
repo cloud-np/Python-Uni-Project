@@ -30,13 +30,6 @@ class Net:
 
         # print()
 
-    def serialize(self):
-        return {
-            'net_id': self.id,
-            'nodes_names': self.nodes_names,
-            'net_degree': self.net_degree
-        }
-
     def get_key(self):
         return self.id
 

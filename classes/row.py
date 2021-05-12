@@ -13,16 +13,7 @@ class Row:
         self.x_end = x + x_end
         self.x = x
 
-    def serialize(self):
-        return {
-            'row_id': self.id,
-            'height': self.height,
-            'y': self.y,
-            'x': self.x,
-            'x_end': self.x_end,
-            'y_end': self.y_end,
-            'cells': [cell.name for cell in self.cells],
-            'width': self.width
-        }
+    def __str__(self):
+        return f"Row[{self.id}] x/y: ({self.x},{self.y})"
     # def set_cells(self, cells: List[Node]):
     #     self.cells = cells

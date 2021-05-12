@@ -1,4 +1,6 @@
 from classes.design import Design
+from classes.node import Node
+from typing import List
 import pygame as pg
 
 
@@ -21,35 +23,71 @@ class Visualizer:
         self.design = design
         self.clock = pg.time.Clock()
         self.is_running: bool = False
+        self.nodes_info: List[str] = []
         self.x_offset: int = 100
-        self.y_offset: int = 12
+        self.y_offset: int = 20
         self.mltpl: int = 8  # multiplier to zoom-in or out
-        self.screen = pg.display.set_mode((800, 800))
-        color = (255, 255, 255)
+        self.canvas_width = 800
+        self.canvas_height = 800
+        pg.init()
+        pg.display.set_caption('Chip Area')
+        self.screen = pg.display.set_mode((1200, 900))
+        # In case of missing fonts.
+        try:
+            self.font = pg.font.Font('frontend/fonts/Roboto-Medium.ttf', 25)
+        except(Exception):
+            print("You are missing the font: 'Roboto-Medium.ttf'.\nA valid one from the system will be picked.")
+            self.font = pg.font.Font(None, 15)
+        self.bg_color = (17, 17, 17)
+        self.no_info = self.font.render('', True, (255, 255, 255))
 
-        self.screen.fill(color)
+        self.screen.fill(self.bg_color)
+        self.nodes_rect: List[pg.Rect] = list()
+
+        for c in self.design.c_nodes:
+            nrml_x = c.x + self.x_offset
+            nrml_y = self.normalize_y(c.y)
+            self.nodes_rect.append(pg.Rect(
+                (nrml_x, nrml_y, c.width, c.height * 8)  # Maybe height * 8 is not right here but works for now.
+            ))
 
     def draw_rows(self):
         #         x      y    width   height
         # rect = (100,  200,   110,    200)
-        color = (0, 0, 0)
+        color = (255, 255, 255)
         for row in self.design.rows:
-            # color = (randint(0, 255), randint(0, 255), randint(0, 255))
+            nrml_x = self.canvas_height - self.x_offset
+            nrml_y = self.normalize_y(row.y)
             pg.draw.line(
-                self.screen, color, (self.x_offset, ((row.y - 100) + self.y_offset) * self.mltpl), (800 - self.x_offset, ((row.y - 100) + self.y_offset) * self.mltpl)
+                self.screen, color, (self.x_offset, nrml_y), (nrml_x, nrml_y)
             )
             # rect = (row.x, row.y * i, row.width * 3, row.height * 3)
             # py_g.draw.rect(self.screen, color, rect)
 
-        for c in self.design.c_nodes:
-            pg.draw.rect(
-                self.screen, c.color, ((c.x + self.x_offset), ((c.y - 100) + self.y_offset) * self.mltpl, c.width, c.height * 8)  # Maybe height * 8 is not right here but works for now.
-            )
+    def normalize_y(self, y):
+        return self.canvas_height - ((y - 100) + self.y_offset) * self.mltpl
+
+    def draw_cells(self):
+        for rect, n in zip(self.nodes_rect, self.design.c_nodes):
+            pg.draw.rect(self.screen, n.color, rect)
+
+        # for c in self.design.c_nodes:
+        #     nrml_x = c.x + self.x_offset
+        #     nrml_y = self.normalize_y(c.y)
+        #     pg.draw.rect(
+        #         self.screen, c.color, (nrml_x, nrml_y, c.width * 8, c.height * 8)  # Maybe height * 8 is not right here but works for now.
+        #     )
+        # Show terminal nodes.
+        # for nt in self.design.t_nodes:
+        #     pg.draw.circle(
+        #         self.screen, nt.color, ((nt.x + self.x_offset), ((nt.y - 100) + self.y_offset)), radius=5
+        #     )
+        #     print(nt, f'--> ({(nt.x + self.x_offset)},{(nt.y - 100) + self.y_offset})')
 
     def show_design(self):
         self.is_running = True
 
-        self.draw_rows()
+        self.setup_screen()
         while self.is_running:
             m_pos = pg.mouse.get_pos()
 
@@ -57,16 +95,37 @@ class Visualizer:
             if event_code == EventType.QUIT:
                 self.is_running = False
             elif event_code == EventType.MOUSE_BUTTONUP:
-                self.reveal_node_info(m_pos)
+                self.get_clicked_nodes(m_pos)
+                print(m_pos)
+                self.setup_screen()
+            self.show_clicked_node_info()
+
+            # self.screen.blit(self.nodes_info, (780, 100))
+            # text = self.font.render(msg, True, (255, 255, 255))
             pg.display.update()
 
-    def reveal_node_info(self, m_pos):
-        # node = self.find_clicked_node(m_pos)
-        ...
+    def show_clicked_node_info(self):
 
-    def find_clicked_node(self, m_pos):
+        if len(self.nodes_info) == 0:
+            return
 
-        ...
+        for i, info_arr in enumerate(self.nodes_info):
+            txt = "".join(info_arr)
+
+            # for txt in info_arr:
+            text = self.font.render(txt, True, (255, 255, 255))
+            self.screen.blit(text, (780, (80 + i * 50)))
+
+    def get_clicked_nodes(self, m_pos):
+        nodes_clicked: List[Node] = [node for rect, node in zip(self.nodes_rect, self.design.c_nodes) if rect.collidepoint(m_pos)]
+        self.nodes_info = [f"{n.name} w/h: ({n.width},{n.height}) pos: ({n.x},{n.y})" for n in nodes_clicked]
+
+    def setup_screen(self):
+        # Clear screen
+        self.screen.fill(self.bg_color)
+        # Draw the bare minimum.
+        self.draw_rows()
+        self.draw_cells()
 
     @staticmethod
     def check_for_events():

@@ -18,13 +18,6 @@ class Design:
         self.assign_nodes_to_nets()
         self.assign_nodes_to_rows()
 
-    def serialize(self):
-        return {
-            'design_id': self.id,
-            'width': 800,
-            'height': 800,
-        }
-
     def find_node_by_name(self, name: str):
         """Find the a node by a given name.
 
