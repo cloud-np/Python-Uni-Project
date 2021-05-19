@@ -1,4 +1,5 @@
 from classes.node import Node
+from classes.design import Design
 from classes.net import Net
 from classes.row import Row
 from typing import List
@@ -7,15 +8,23 @@ from typing import List
 class Parser:
     def __init__(
         self,
-        path_to_nets: str = "./data/design.nets",
-        path_to_nodes: str = "./data/design.nodes",
-        path_to_pl: str = "./data/design.pl",
-        path_to_scl: str = "./data/design.scl",
+        design_path: str = "./data/",
+        nets_fname: str = "design.nets",
+        nodes_fname: str = "design.nodes",
+        pl_fname: str = "design.pl",
+        scl_fname: str = "design.scl",
     ):
-        self.path_to_nets = path_to_nets
-        self.path_to_nodes = path_to_nodes
-        self.path_to_pl = path_to_pl
-        self.path_to_scl = path_to_scl
+        self.path_to_nets = design_path + nets_fname
+        self.path_to_nodes = design_path + nodes_fname
+        self.path_to_pl = design_path + pl_fname
+        self.path_to_scl = design_path + scl_fname
+
+    def parse_design(self):
+        nodes_list = self.parse_nodes()
+        nodes_pos = self.parse_nodes_position()
+        net_list = self.parse_nets()
+        row_list = self.parse_rows()
+        return Design(0, set(net_list), nodes_list, nodes_pos, row_list)
 
     def parse_nodes(self):
         # Make list here with size of len(nodes)
@@ -23,18 +32,17 @@ class Parser:
         with open(self.path_to_nodes, "r") as nodes_file:
             nodes_lines = nodes_file.readlines()[7:]
 
-            for line in nodes_lines:
+            for i, line in enumerate(nodes_lines):
                 line_splited = line.split()
 
-                # We keep the name number in the node a id.
-                # The reason we keep this and not an iter of how many nodes
-                # we saw with something like enumerate() is because we need
-                # to seperate the terminal nodes with the cell ones.
+                # We keep the name number in the node a gid (group_id Look for more details in node.py).
+                # The reason we keep this and not only an iter of how many nodes
+                # is to seperate the terminal nodes with the cell ones.
                 # With this we can do really fast searches as such
-                # e.g: node_list[a2_node_id] ---> Node("a2")
+                # e.g: terminal_nodes_only[p2_node_gid] ---> Node("p2")
                 node_name = line_splited[0]
                 nodes_list.append(
-                    Node(int(node_name[1:]) - 1, node_name, int(line_splited[1]), int(line_splited[2]))
+                    Node(i, int(node_name[1:]) - 1, node_name, int(line_splited[1]), int(line_splited[2]))
                 )
         return nodes_list
 

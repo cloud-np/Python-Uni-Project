@@ -44,6 +44,7 @@ class Visualizer:
         self.screen.fill(self.bg_color)
         self.nodes_rect: List[pg.Rect] = list()
 
+        # Make rectangles for all cell nodes in the screen
         for c in self.design.c_nodes:
             nrml_x = c.x + self.x_offset
             nrml_y = self.normalize_y(c.y)
