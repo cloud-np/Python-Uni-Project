@@ -1,5 +1,5 @@
 from colorama import Fore
-from typing import List, Iterable
+from typing import List
 from classes.node import Node
 
 

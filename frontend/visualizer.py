@@ -106,7 +106,6 @@ class Visualizer:
             pg.display.update()
 
     def show_clicked_node_info(self):
-
         if len(self.nodes_info) == 0:
             return
 

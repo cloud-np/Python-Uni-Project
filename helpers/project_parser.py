@@ -42,7 +42,7 @@ class Parser:
                 # e.g: terminal_nodes_only[p2_node_gid] ---> Node("p2")
                 node_name = line_splited[0]
                 nodes_list.append(
-                    Node(i, int(node_name[1:]) - 1, node_name, int(line_splited[1]), int(line_splited[2]))
+                    Node(id_=i, gid=int(node_name[1:]) - 1, name=node_name, width=int(line_splited[1]), height=int(line_splited[2]))
                 )
         return nodes_list
 
