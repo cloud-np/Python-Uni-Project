@@ -2,5 +2,6 @@
 main.py
 */__pycache__/
 proj-venv/
+venv/
 data/test/
 jupyter.ipynb
