@@ -44,12 +44,16 @@ class Gordian:
                 for node2 in self.design.c_nodes:
                     if node is node2:
                         continue
-                    for net in self.design.nets:
-                        if (node in net.nodes and node2 in net.nodes):
-                            n_ids = [node.gid, node2.gid]
-                            weight = self.__get_edge_weight(node, node2)
-                            matrix[n_ids[0]][n_ids[1]] = weight
-                            matrix[n_ids[1]][n_ids[0]] = weight
+                    weight = self.__get_edge_weight(node, node2)
+                    matrix[node.gid][node2.gid] = weight
+                    matrix[node2.gid][node.gid] = weight
+                    # Old and worse way to get the weight NOTE the __get_edge_weight was the same!
+                    # for net in self.design.nets:
+                    #     if (node in net.nodes and node2 in net.nodes):
+                    #         n_ids = [node.gid, node2.gid]
+                    #         weight = self.__get_edge_weight(node, node2)
+                    #         matrix[n_ids[0]][n_ids[1]] = weight
+                    #         matrix[n_ids[1]][n_ids[0]] = weight
         populate(self.cell_matrix, self.design.c_nodes)
         populate(self.pin_matrix, self.design.t_nodes)
 
