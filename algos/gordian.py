@@ -20,7 +20,7 @@ class Gordian:
         pin_x_pos = [pin.x for pin in self.design.t_nodes]
         pin_y_pos = [pin.y for pin in self.design.t_nodes]
 
-        # We use "-1 *" just to be a bit more readable.
+        # We use "-1 *" just to make it a bit more readable.
         fixed_pin_x = np.array([-1 * np.sum(self.pin_matrix[i] * pin_x_pos[i]) for i in range(len(self.design.t_nodes))])
         fixed_pin_y = np.array([-1 * np.sum(self.pin_matrix[i] * pin_y_pos[i]) for i in range(len(self.design.t_nodes))])
         return fixed_pin_x, fixed_pin_y
@@ -44,16 +44,17 @@ class Gordian:
                 for node2 in self.design.c_nodes:
                     if node is node2:
                         continue
-                    weight = self.__get_edge_weight(node, node2)
-                    matrix[node.gid][node2.gid] = weight
-                    matrix[node2.gid][node.gid] = weight
-                    # Old and worse way to get the weight NOTE the __get_edge_weight was the same!
-                    # for net in self.design.nets:
-                    #     if (node in net.nodes and node2 in net.nodes):
-                    #         n_ids = [node.gid, node2.gid]
-                    #         weight = self.__get_edge_weight(node, node2)
-                    #         matrix[n_ids[0]][n_ids[1]] = weight
-                    #         matrix[n_ids[1]][n_ids[0]] = weight
+                    # NOTE:
+                    # Although this makes more sense and its faster
+                    # we assign values even to nodes that are not correlated
+                    # weight = self.__get_edge_weight(node, node2)
+                    # matrix[node.gid][node2.gid] = weight
+                    # matrix[node2.gid][node.gid] = weight
+                    for net in self.design.nets:
+                        if (node in net.nodes and node2 in net.nodes):
+                            weight = self.__get_edge_weight(node, node2)
+                            matrix[node.gid][node2.gid] = weight
+                            matrix[node2.gid][node.gid] = weight
         populate(self.cell_matrix, self.design.c_nodes)
         populate(self.pin_matrix, self.design.t_nodes)
 
@@ -73,7 +74,6 @@ class Gordian:
         Returns:
             float: Returns the weight of the edge.
         """
-        # With no round().
         edge_weight = sum([2 / len(net.nodes) for net in self.design.nets if (node in net.nodes and node2 in net.nodes)])
         # edge_weight = round(sum([2 / len(net.nodes) for net in self.design.nets if (node in net.nodes and node2 in net.nodes)]), 2)
         return edge_weight if edge_weight > 0 else 1

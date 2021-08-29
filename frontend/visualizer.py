@@ -1,6 +1,6 @@
 from classes.design import Design
 from classes.node import Node
-from typing import List
+from typing import List, Tuple
 import pygame as pg
 
 
@@ -11,79 +11,78 @@ class EventType:
     NO_EVENT = 0
     STOP = 1
     START = 2
-    SHOW_INDEX = 3
-    SHOW_NORMALIZED_INDEX = 4
-    SHOW_IMGS = 5
-    MOUSE_BUTTONDOWN = 6
-    MOUSE_BUTTONUP = 7
+    MOUSE_BUTTONDOWN = 3
+    MOUSE_BUTTONUP = 4
+    ZOOM_IN = 5
+    ZOOM_OUT = 6
 
 
 class Visualizer:
     def __init__(self, design: Design):
-        self.design = design
+        self.design: Design = design
         self.clock = pg.time.Clock()
         self.is_running: bool = False
         self.nodes_info: List[str] = []
         self.x_offset: int = 100
         self.y_offset: int = 20
-        self.mltpl: int = 8  # multiplier to zoom-in or out
-        self.canvas_width = 800
-        self.canvas_height = 800
+        self.mltpl: int = 4  # multiplier to zoom-in or out
+        self.canvas_width: int = 800
+        self.canvas_height: int = 800
         pg.init()
         pg.display.set_caption('Chip Area')
-        self.screen = pg.display.set_mode((1200, 900))
+        self.screen: pg.Surface = pg.display.set_mode((1200, 900))
         # In case of missing fonts.
         try:
             self.font = pg.font.Font('frontend/fonts/Roboto-Medium.ttf', 25)
         except(Exception):
             print("You are missing the font: 'Roboto-Medium.ttf'.\nA valid one from the system will be picked.")
             self.font = pg.font.Font(None, 15)
-        self.bg_color = (17, 17, 17)
+        self.bg_color: Tuple[int] = (17, 17, 17)
         self.no_info = self.font.render('', True, (255, 255, 255))
 
         self.screen.fill(self.bg_color)
         self.nodes_rect: List[pg.Rect] = list()
 
-        # Make rectangles for all cell nodes in the screen
-        for c in self.design.c_nodes:
-            nrml_x = c.x + self.x_offset
-            nrml_y = self.normalize_y(c.y)
-            self.nodes_rect.append(pg.Rect(
-                (nrml_x, nrml_y, c.width, c.height * 8)  # Maybe height * 8 is not right here but works for now.
-            ))
+        self.make_nodes_rect()
 
-    def draw_rows(self):
+    def make_nodes_rect(self) -> None:
+        """Creates the rectangulars for all the nodes to display on the screen."""
+        for n in self.design.nodes:
+            if not n.is_terminal:
+                self.nodes_rect.append(pg.Rect(
+                    (self.nrml_x(n.x), self.nrml_y(n.y), n.width * 4, n.height * 4)
+                ))
+            else:
+                # y_adder: int = 10 if n.gid != 0 and n.gid != 1 else 0
+                y_adder = 20
+                self.nodes_rect.append(pg.Rect(
+                    (self.nrml_x(n.x), self.nrml_y(n.y) + y_adder, (n.width * 4) + 5, (n.height * 4) + 5)
+                ))
+
+    # def draw_terminals(self) -> None:
+    #     for t in self.design.t_nodes:
+    #         pg.draw.circle(self.screen, t.color, (t.x, t.y), 10)
+
+    def draw_rows(self) -> None:
         #         x      y    width   height
         # rect = (100,  200,   110,    200)
-        color = (255, 255, 255)
+        color: Tuple[int] = (255, 255, 255)
         for row in self.design.rows:
-            nrml_x = self.canvas_height - self.x_offset
-            nrml_y = self.normalize_y(row.y)
+            nrml_x: int = self.canvas_height - self.x_offset
+            nrml_y: int = self.nrml_y(row.y)
             pg.draw.line(
                 self.screen, color, (self.x_offset, nrml_y), (nrml_x, nrml_y)
             )
-            # rect = (row.x, row.y * i, row.width * 3, row.height * 3)
-            # py_g.draw.rect(self.screen, color, rect)
 
-    def normalize_y(self, y):
-        return self.canvas_height - ((y - 100) + self.y_offset) * self.mltpl
+    def nrml_x(self, x):
+        return ((x * self.mltpl) + self.x_offset)
 
-    def draw_cells(self):
-        for rect, n in zip(self.nodes_rect, self.design.c_nodes):
+    def nrml_y(self, y):
+        return self.canvas_height - ((y * self.mltpl) + self.y_offset)
+
+    def draw_nodes(self):
+        for rect, n in zip(self.nodes_rect, self.design.nodes):
             pg.draw.rect(self.screen, n.color, rect)
-
-        # for c in self.design.c_nodes:
-        #     nrml_x = c.x + self.x_offset
-        #     nrml_y = self.normalize_y(c.y)
-        #     pg.draw.rect(
-        #         self.screen, c.color, (nrml_x, nrml_y, c.width * 8, c.height * 8)  # Maybe height * 8 is not right here but works for now.
-        #     )
-        # Show terminal nodes.
-        # for nt in self.design.t_nodes:
-        #     pg.draw.circle(
-        #         self.screen, nt.color, ((nt.x + self.x_offset), ((nt.y - 100) + self.y_offset)), radius=5
-        #     )
-        #     print(nt, f'--> ({(nt.x + self.x_offset)},{(nt.y - 100) + self.y_offset})')
 
     def show_design(self):
         self.is_running = True
@@ -99,6 +98,10 @@ class Visualizer:
                 self.get_clicked_nodes(m_pos)
                 print(m_pos)
                 self.setup_screen()
+            # elif event_code == EventType.ZOOM_IN:
+            #     self.y_mltpl += 1
+            # elif event_code == EventType.ZOOM_OUT:
+            #     self.y_mltpl -= 1
             self.show_clicked_node_info()
 
             # self.screen.blit(self.nodes_info, (780, 100))
@@ -117,7 +120,7 @@ class Visualizer:
             self.screen.blit(text, (780, (80 + i * 50)))
 
     def get_clicked_nodes(self, m_pos):
-        nodes_clicked: List[Node] = [node for rect, node in zip(self.nodes_rect, self.design.c_nodes) if rect.collidepoint(m_pos)]
+        nodes_clicked: List[Node] = [node for rect, node in zip(self.nodes_rect, self.design.nodes) if rect.collidepoint(m_pos)]
         self.nodes_info = [f"{n.name} w/h: ({n.width},{n.height}) pos: ({n.x},{n.y})" for n in nodes_clicked]
 
     def setup_screen(self):
@@ -125,7 +128,7 @@ class Visualizer:
         self.screen.fill(self.bg_color)
         # Draw the bare minimum.
         self.draw_rows()
-        self.draw_cells()
+        self.draw_nodes()
 
     @staticmethod
     def check_for_events():
@@ -146,14 +149,8 @@ class Visualizer:
                 return EventType.MOUSE_BUTTONUP
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_1:
-                    return EventType.SHOW_INDEX
+                    return EventType.ZOOM_IN
                 if event.key == pg.K_2:
-                    return EventType.SHOW_NORMALIZED_INDEX
-                if event.key == pg.K_3:
-                    return EventType.SHOW_IMGS
+                    return EventType.ZOOM_OUT
 
-                #     pick_piece(mouse_x, mouse_y)
-            # elif P2_COMPUTER and history['player'] % 2 != 0:
-            #     self.pc_make_move(history, False)
-            #     history['player'] += 1
         return EventType.NO_EVENT
