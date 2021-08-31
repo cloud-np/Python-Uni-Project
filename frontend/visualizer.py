@@ -108,6 +108,9 @@ class Visualizer:
             # text = self.font.render(msg, True, (255, 255, 255))
             pg.display.update()
 
+    def draw_middle_point(self):
+        ...
+
     def show_clicked_node_info(self):
         if len(self.nodes_info) == 0:
             return
