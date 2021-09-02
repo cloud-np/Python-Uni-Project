@@ -3,7 +3,43 @@ from classes.node import Node
 import numpy as np
 from cvxopt import matrix, solvers
 from data.gordian_example import cell_matrix, pin_matrix, fixed_pin_x, fixed_pin_y
-from typing import Any, List, Tuple
+from typing import List, Tuple
+
+
+class Partition:
+    def __init__(self, _id: int, cells: List[Node], border_points: np.array):
+        self.id: int = _id
+        self.cells: List[Node] = cells
+        self.border_points: np.array = border_points if border_points is not None \
+            else self.__create_initial_border_points()
+
+    @staticmethod
+    def create_initial_partitions(cells, rows):
+        # We sort by the x attr
+        sorted_cells: List[Node] = sorted(cells, key=lambda c: c.x)
+        sc_half: int = len(sorted_cells) // 2
+        f_half_c: List[Node] = sorted_cells[:sc_half]
+        s_half_c: List[Node] = sorted_cells[sc_half:]
+        f_half_p, s_half_p = Partition.__create_initial_border_points(rows)
+        Partition(0, cells=f_half_c, border_points=f_half_p)
+        Partition(1, cells=s_half_c, border_points=s_half_p)
+        ...
+
+    @staticmethod
+    def __create_initial_border_points(rows) -> Tuple[np.array]:
+        return Partition.create_border_points(
+            rows[0].x,  # x1
+            rows[len(rows) - 1].x_end  # x2
+        )
+
+    @staticmethod
+    def create_border_points(p1: int, p2: int):
+        x_mid = (p1 + p2) / 2
+        return np.array([p1, x_mid]), np.array([x_mid, p2])
+
+    def create_sub_partitions(self):
+        # Create sub partitions from this part.
+        ...
 
 
 class Gordian:
@@ -12,8 +48,9 @@ class Gordian:
             self.design: Design = design
             num_cnodes: int = len(self.design.c_nodes)
 
-            self.pin_matrix: Any = np.zeros((num_cnodes, len(self.design.t_nodes)))
-            self.cell_matrix: Any = np.zeros((num_cnodes, num_cnodes))
+            self.pin_matrix: np.ndarray = np.zeros(
+                (num_cnodes, len(self.design.t_nodes)))
+            self.cell_matrix: np.ndarray = np.zeros((num_cnodes, num_cnodes))
             self.__populate_cell_and_pin_matrixs()
 
             self.fixed_pin_x, self.fixed_pin_y = self.__create_fixed_pin_vectors()
@@ -27,15 +64,17 @@ class Gordian:
     def find_middle_point(xs: Tuple[float], ys: Tuple[float]) -> Tuple[float]:
         return ([(xs[0] + xs[1]) / 2, (ys[0] + ys[1]) / 2])
 
-    def create_subpartitions_border_points(self, first_point: np.array, second_point: np.array):
-        x_mid = (first_point[0] + second_point[0]) / 2
-        return [first_point[0], x_mid], [x_mid, second_point[0]]
+    def stopping_cond_met(self, partitions: List[Node]) -> bool:
+        return any(len(p) < 2 for p in partitions)
 
-    def create_subpartitions(self):
-        last_row = len(self.design.rows) - 1
-        x1, y1 = self.design.rows[0].x_end, self.design.rows[0].y
-        x2, y2 = self.design.rows[last_row].x, self.design.rows[last_row].y_end
-        self.create_subpartitions_border_points(np.array([x1, y1]), np.array[x2, y2])
+    def run(self):
+        partitions = Partition.create_initial_partitions()
+        a: np.ndarray = np.zeros((2, 10))
+        a[0][:len(first_half) - 1] = 1 / len(first_half)
+        a[1][len(second_half) - 1:] = 1 / len(second_half)
+
+        while not self.stopping_cond_met(partitions):
+            break
 
     def solve_qp(self):
         # .T means transponse e.g: [[1, 2], [3, 4]].T => [[1, 3]]
@@ -46,11 +85,14 @@ class Gordian:
         return np.array(sol['x']).reshape((C.shape[1]))
 
     def __create_fixed_pin_vectors(self) -> Tuple[np.ndarray, np.ndarray]:
-        pin_x_pos, pin_y_pos = [pin.x for pin in self.design.t_nodes], [pin.y for pin in self.design.t_nodes]
+        pin_x_pos, pin_y_pos = [pin.x for pin in self.design.t_nodes], [
+            pin.y for pin in self.design.t_nodes]
 
         # We use "-1 *" just to make it a bit more readable.
-        fixed_pin_x = np.array([-1 * np.sum(self.pin_matrix[i] * pin_x_pos[i]) for i in range(len(self.design.t_nodes))])
-        fixed_pin_y = np.array([-1 * np.sum(self.pin_matrix[i] * pin_y_pos[i]) for i in range(len(self.design.t_nodes))])
+        fixed_pin_x = np.array([-1 * np.sum(self.pin_matrix[i] * pin_x_pos[i])
+                               for i in range(len(self.design.t_nodes))])
+        fixed_pin_y = np.array([-1 * np.sum(self.pin_matrix[i] * pin_y_pos[i])
+                               for i in range(len(self.design.t_nodes))])
         return fixed_pin_x, fixed_pin_y
 
     def __create_degree_matrix(self) -> np.ndarray:
