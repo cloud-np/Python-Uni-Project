@@ -98,6 +98,8 @@ class Visualizer:
                 self.get_clicked_nodes(m_pos)
                 print(m_pos)
                 self.setup_screen()
+            elif event_code == EventType.QUIT:
+                pg.quit()
             # elif event_code == EventType.ZOOM_IN:
             #     self.y_mltpl += 1
             # elif event_code == EventType.ZOOM_OUT:
@@ -151,6 +153,8 @@ class Visualizer:
             elif event.type == pg.MOUSEBUTTONUP:
                 return EventType.MOUSE_BUTTONUP
             elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_q:
+                    return EventType.QUIT
                 if event.key == pg.K_1:
                     return EventType.ZOOM_IN
                 if event.key == pg.K_2:

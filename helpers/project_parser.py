@@ -19,7 +19,7 @@ class Parser:
         self.path_to_pl = design_path + pl_fname
         self.path_to_scl = design_path + scl_fname
 
-    def parse_design(self):
+    def parse_design(self) -> Design:
         nodes_list = self.parse_nodes()
         nodes_pos = self.parse_nodes_position()
         net_list = self.parse_nets()
