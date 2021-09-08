@@ -98,17 +98,12 @@ class Visualizer:
                 self.get_clicked_nodes(m_pos)
                 print(m_pos)
                 self.setup_screen()
-            elif event_code == EventType.QUIT:
-                pg.quit()
-            # elif event_code == EventType.ZOOM_IN:
-            #     self.y_mltpl += 1
-            # elif event_code == EventType.ZOOM_OUT:
-            #     self.y_mltpl -= 1
             self.show_clicked_node_info()
 
             # self.screen.blit(self.nodes_info, (780, 100))
             # text = self.font.render(msg, True, (255, 255, 255))
             pg.display.update()
+            # elif event_code == EventType.ZOOM_IN:
 
     def draw_middle_point(self):
         ...

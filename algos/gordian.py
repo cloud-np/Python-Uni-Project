@@ -6,6 +6,9 @@ from data.gordian_example import cell_matrix, pin_matrix, fixed_pin_x, fixed_pin
 from typing import List, Tuple
 
 
+# NOTE: Maybe change border points to x, x_end and
+# y, y_end. More readable/easier to work with plus
+# more  consistent with what you wrote in Node class
 class Partition:
     def __init__(self, _id: int, cells: List[Node], border_xs: np.array, border_ys) -> None:
         self.id: int = _id

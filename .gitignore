@@ -1,5 +1,4 @@
 .vscode/
-main.py
 */__pycache__/
 proj-venv/
 venv/
