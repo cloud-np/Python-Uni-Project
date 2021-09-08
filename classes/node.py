@@ -19,7 +19,7 @@ class Node:
         # but there is one unique "id" for every Node!!
         self.gid = gid
         self.id = id_
-        random.seed(sum([ord(ch) + 10 for ch in name]))
+        random.seed(sum(ord(ch) + 10 for ch in name))
         self.color = [random.randint(0, 255) for _ in range(3)]
         self.is_terminal: bool = name[0] == 'p'
 
