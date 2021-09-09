@@ -1,5 +1,5 @@
 from colorama import Fore
-from typing import List
+from typing import List, Union
 from classes.node import Node
 
 
@@ -9,7 +9,7 @@ class Net:
         self.nodes_names = nodes_names
         self.nodes: List[Node] = list()
         self.net_degree = len(nodes_names)
-        self.semiperimeter: int = -1
+        self.semiperimeter: Union[float, None] = None
 
     def show_nodes(self):
         tmp_str = "nodes: { "
@@ -22,16 +22,13 @@ class Net:
         self.nodes = nodes
         self.calc_new_perimeter()
 
-    def calc_new_perimeter(self):
-        # min_x = min(self.nodes)
+    def calc_new_perimeter(self) -> float:
         min_x = min(self.nodes, key=lambda node: node.x).x
         min_y = min(self.nodes, key=lambda node: node.y).y
         max_x = max(self.nodes, key=lambda node: node.x).x
         max_y = max(self.nodes, key=lambda node: node.y).y
-        # semiPerimeterSum += Math.abs(maxX - minX) + Math.abs(maxY - minY);
         self.semiperimeter = abs(max_x - min_x) + abs(max_y - min_y)
-
-        # print()
+        return self.semiperimeter
 
     def get_key(self):
         return self.id

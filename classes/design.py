@@ -18,6 +18,9 @@ class Design:
         self.assign_nodes_to_nets()
         self.assign_nodes_to_rows()
 
+    def change_cells_pos(self, new_xs, new_ys):
+        [c.set_position(x, y) for c, x, y in zip(self.c_nodes, new_xs, new_ys)]
+
     def find_node_by_name(self, name: str):
         """Find the a node by a given name.
 
@@ -53,3 +56,6 @@ class Design:
 
     def assign_pos_to_nodes(self, pos: List[List[str]]) -> None:
         [self.find_node_by_name(name=arr[0]).set_position(int(arr[1]), int(arr[2])) for arr in pos]
+
+    def find_cable_needed(self):
+        return sum(net.calc_new_perimeter() for net in self.nets)

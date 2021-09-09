@@ -12,8 +12,14 @@ class Row:
         self.cells: List[Node] = []
         self.x_end = x + x_end
         self.x = x
+        self.avail_x_start = x
 
     def __str__(self):
         return f"Row[{self.id}] x/y: ({self.x},{self.y})"
-    # def set_cells(self, cells: List[Node]):
-    #     self.cells = cells
+
+    def has_space_for(self, cell):
+        return self.avail_x_start + cell.width < self.x_end
+
+    def add_cell(self, cell):
+        self.cells.append(cell)
+        self.avail_x_start += cell.width

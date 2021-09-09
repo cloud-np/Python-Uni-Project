@@ -1,7 +1,10 @@
 from classes.design import Design
+from algos.legalizer import Tetris
 from classes.node import Node
 from typing import List, Tuple
 import pygame as pg
+
+DELAY = 100
 
 
 class EventType:
@@ -41,12 +44,14 @@ class Visualizer:
         self.no_info = self.font.render('', True, (255, 255, 255))
 
         self.screen.fill(self.bg_color)
-        self.nodes_rect: List[pg.Rect] = list()
+        self.nodes_rect: List[pg.Rect] = []
 
         self.make_nodes_rect()
 
     def make_nodes_rect(self) -> None:
         """Creates the rectangulars for all the nodes to display on the screen."""
+        # Reset the list
+        self.nodes_rect: List[pg.Rect] = []
         for n in self.design.nodes:
             if not n.is_terminal:
                 self.nodes_rect.append(pg.Rect(
@@ -86,6 +91,7 @@ class Visualizer:
 
     def show_design(self):
         self.is_running = True
+        tetris = Tetris(self.design)
 
         self.setup_screen()
         while self.is_running:
@@ -98,15 +104,32 @@ class Visualizer:
                 self.get_clicked_nodes(m_pos)
                 print(m_pos)
                 self.setup_screen()
+            else:
+                if tetris.has_ended():
+                    return
+                pg.time.wait(DELAY)
+                self.redraw_screen()
+                self.highlight_next_cell(tetris.get_curr_cell(), tetris.get_last_cell())
+                tetris.next()
             self.show_clicked_node_info()
-
-            # self.screen.blit(self.nodes_info, (780, 100))
-            # text = self.font.render(msg, True, (255, 255, 255))
             pg.display.update()
-            # elif event_code == EventType.ZOOM_IN:
 
-    def draw_middle_point(self):
-        ...
+    def dehighlight_cell(self, cell):
+        cell.color = cell.og_color
+
+    def highlight_next_cell(self, cell, last_cell):
+        if cell is not None:
+            cell.color = (255, 255, 255)
+            self.nodes_info = Visualizer.__nodes_to_str([cell])
+        if last_cell is not None:
+            self.dehighlight_cell(last_cell)
+        self.redraw_screen()
+
+    def redraw_screen(self) -> None:
+        self.screen.fill(self.bg_color)
+        self.make_nodes_rect()
+        self.draw_nodes()
+        self.draw_rows()
 
     def show_clicked_node_info(self):
         if len(self.nodes_info) == 0:
@@ -121,7 +144,11 @@ class Visualizer:
 
     def get_clicked_nodes(self, m_pos):
         nodes_clicked: List[Node] = [node for rect, node in zip(self.nodes_rect, self.design.nodes) if rect.collidepoint(m_pos)]
-        self.nodes_info = [f"{n.name} w/h: ({n.width},{n.height}) pos: ({n.x},{n.y})" for n in nodes_clicked]
+        self.nodes_info = Visualizer.__nodes_to_str(nodes_clicked)
+
+    @staticmethod
+    def __nodes_to_str(nodes: List[Node]) -> List[str]:
+        return [f"{n.name} w/h: ({n.width},{n.height}) pos: ({round(n.x, 2)},{round(n.y, 2)})" for n in nodes]
 
     def setup_screen(self):
         # Clear screen
