@@ -10,16 +10,26 @@ class Row:
         self.width = x_end - x
         self.y_end = y + height
         self.cells: List[Node] = []
-        self.x_end = x + x_end
+        self.x_end = x_end
         self.x = x
-        self.avail_x_start = x
+        self.gap_left: float = x_end - x
+        self.avail_x_start: float = x
+        self.avail_x_end: float = x_end
 
     def __str__(self):
         return f"Row[{self.id}] x/y: ({self.x},{self.y})"
 
     def has_space_for(self, cell):
-        return self.avail_x_start + cell.width < self.x_end
+        return self.gap_left - cell.width >= 0
 
-    def add_cell(self, cell):
+    def swap_cell(self):
+        ...
+
+    def add_cell(self, cell, add_to_end: bool = False):
         self.cells.append(cell)
-        self.avail_x_start += cell.width
+
+        if add_to_end:
+            self.avail_x_end -= cell.width
+        else:
+            self.avail_x_start += cell.width
+        self.gap_left -= cell.width

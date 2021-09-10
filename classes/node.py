@@ -59,10 +59,8 @@ class Node:
         else:
             return NotImplemented
 
-    """Because we need to check only the names we don't want
-    to check if they are equal based on id. """
-
     def __eq__(self, other: "Node"):
+        """Because we need to check only the names we don't want to check if they are equal based on id. """
         if self.__class__ == other.__class__:
             return self.name == other.name
             # return self.__key() == other.__key()

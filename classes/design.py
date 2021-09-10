@@ -18,6 +18,8 @@ class Design:
         self.assign_nodes_to_nets()
         self.assign_nodes_to_rows()
 
+        self.initial_cable_needed = self.find_cable_needed()
+
     def change_cells_pos(self, new_xs, new_ys):
         [c.set_position(x, y) for c, x, y in zip(self.c_nodes, new_xs, new_ys)]
 

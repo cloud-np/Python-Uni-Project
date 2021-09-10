@@ -1,8 +1,9 @@
 from helpers.project_parser import Parser
-from algos.gordian import Gordian
+# from algos.gordian import Gordian
 from classes.design import Design
+from algos.swapper import Swapper, SwapType
 from frontend.visualizer import Visualizer
-from algos.legalizer import Legalizer
+from algos.legalizer import Legalizer, Tetris
 
 
 if __name__ == "__main__":
@@ -13,10 +14,13 @@ if __name__ == "__main__":
     # Gordian(design=design, load_example=False).run()
     # Gordian(design=design, load_example=True).run()
     # # Visualizer(design=design)
-    print(design.find_cable_needed())
-    Visualizer(design=design).show_design()
+
+    tetris = Tetris(design, left_right=True)
+    swapper = Swapper(design, SwapType.BEST_FIT, is_checking=True)
     legalizer = Legalizer(design)
-    print(design.find_cable_needed())
+
+    Visualizer(design=design, tetris=tetris, legalizer=legalizer, swapper=swapper).run()
+
     # overlapping_pairs = Legalizer.check_for_overlaps(design.c_nodes)
     # legalizer.run_tetris()
 
