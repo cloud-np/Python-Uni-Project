@@ -1,13 +1,14 @@
-from typing import Union
+from typing import Union, Tuple
 from helpers.common_classes import Rectangular
+# from classes.row import Row
 import random
 
 
 class Node:
     def __init__(self, id_: int, gid: int, name: str, width: int, height: int):
-        self.name = name
-        self.width = width
-        self.height = height
+        self.name: str = name
+        self.width: float = width
+        self.height: float = height
         self.x: Union[int, None] = None
         self.y: Union[int, None] = None
         self.rectan: Union[Rectangular, None] = None
@@ -19,12 +20,13 @@ class Node:
         # etc
         # Nodes from different groups can have the same gid!!
         # but there is one unique "id" for every Node!!
-        self.gid = gid
-        self.id = id_
+        self.gid: int = gid
+        self.id: int = id_
         random.seed(sum(ord(ch) + 10 for ch in name))
-        self.color = [random.randint(0, 255) for _ in range(3)]
-        self.og_color = self.color
+        self.color: Tuple[int] = [random.randint(0, 255) for _ in range(3)]
+        self.og_color: Tuple[int] = self.color
         self.is_terminal: bool = name[0] == 'p'
+        self.row = None
 
     def set_position(self, x: int, y: int):
         if self.is_terminal is True and self.x is not None:

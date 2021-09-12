@@ -2,7 +2,8 @@ from classes.design import Design
 from helpers.project_parser import Parser
 import numpy as np
 import matplotlib.pyplot as plt
-from algos.legalizer import Tetris, Legalizer
+from algos.legalizer import Legalizer
+from algos.tetris import Tetris
 from algos.swapper import Swapper
 from classes.node import Node
 from typing import List, Tuple

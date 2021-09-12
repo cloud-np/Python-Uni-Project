@@ -2,6 +2,7 @@ from classes.node import Node
 from helpers.project_parser import Parser
 from typing import List
 from classes.design import Design
+from classes.row import PosType
 from helpers.common_classes import Point
 from algos.legalizer import Legalizer
 
@@ -48,16 +49,16 @@ class Tetris:
         return run_info
 
     def pick_best_row_for_cell(self, dict_rows: dict, cell: Node):
-        min_row = min(dict_rows, key=lambda cab: cab['val'])
+        min_row = min(dict_rows, key=lambda cab: cab['val'])['row']
 
         if self.is_place_right:
-            x = min_row['row'].avail_x_end - cell.width
-            min_row['row'].add_cell(cell, add_to_end=True)
+            x = min_row.avail_x_end - cell.width
+            min_row.add_cell(cell, pos_type=PosType.END)
         else:
-            x = min_row['row'].avail_x_start
-            min_row['row'].add_cell(cell)
+            x = min_row.avail_x_start
+            min_row.add_cell(cell, pos_type=PosType.START)
 
-        cell.set_position(x, min_row['row'].y)
+        cell.set_position(x, min_row.y)
 
     def __calc_best_dist_for_cell_lr(self, cell: Node):
         # If our row has space for our cell then it will try to find the distance it needs to that position.

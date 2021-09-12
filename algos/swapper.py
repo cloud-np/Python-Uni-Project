@@ -36,6 +36,7 @@ class Swapper:
     @staticmethod
     def swap_two_cells(cell, cell2):
         c1_pos = (cell.x, cell.y)
+
         cell.set_position(cell2.x, cell2.y)
         cell2.set_position(*c1_pos)
 

@@ -18,6 +18,9 @@ class Net:
         tmp_str += " }"
         return f"ID: {Fore.MAGENTA}{self.id}{Fore.RESET} {tmp_str}\n"
 
+    def get_nodes_str(self):
+        return "".join(f"{node.name} " for node in self.nodes)
+
     def set_nodes(self, nodes: List[Node]):
         self.nodes = nodes
         self.calc_new_perimeter()

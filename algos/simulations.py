@@ -32,13 +32,15 @@ def simulate_many_cells_pos(*cells):
     cells : List[Node]
         The cells we cant to keep the same position for.
     """
-    def __simulate_new_cell_pos(func):
+    def __simulate_many_cell_pos(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            old_positions = [(c.x, c.y) for c in cells]
+            old_cell_info = [{'row': c.row, 'pos': (c.x, c.y)} for c in cells]
             func_return = func(*args, **kwargs)
-            for pos, c in zip(old_positions, cells):
-                c.set_position(*pos)
+            for info, c in zip(old_cell_info, cells):
+                c.set_position(*info['pos'])
+                c.row = info['row']
+
             return func_return
         return wrapper
-    return __simulate_new_cell_pos
+    return __simulate_many_cell_pos

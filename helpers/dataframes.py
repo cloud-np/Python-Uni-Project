@@ -1,7 +1,6 @@
 from classes.design import Design
 import pandas as pd
 from classes.row import Row
-from typing import List
 
 
 columns_for_rows = ["id", "density", "cells", "nets", "x", "y"]
@@ -18,9 +17,9 @@ class DataFrameMaker:
         self.rows_df = DataFrameMaker.for_rows(design)
         # Filter all terminal nodes out.
         self.cell_df = self.nodes_df.loc[self.nodes_df['name'].str[0] != 'p']
-        print(self.cell_df['width'].argmin())
-        print(self.cell_df['width'].argmax())
-        print(self.cell_df['width'].mean())
+        # print(self.cell_df['width'].argmin())
+        # print(self.cell_df['width'].argmax())
+        # print(self.cell_df['width'].mean())
 
         print(self.rows_df)
         print(self.rows_df['density'].argmin())
@@ -53,7 +52,7 @@ class DataFrameMaker:
         for r in design.rows:
             for col in columns_for_rows:
                 if col == 'cells':
-                    nodes_dict[col].append(r.get_cells_str())
+                    nodes_dict[col].append("".join(c.name + " " for c in design.get_cells_in_row(r)))
                 elif col == 'density':
                     nodes_dict[col].append(r.get_density())
                 elif col == 'nets':
@@ -69,7 +68,7 @@ class DataFrameMaker:
         for n in design.nodes:
             for col in columns_for_nodes:
                 if col == 'n-row':
-                    nodes_dict[col].append(format_row_num_for_node_df(design.get_row_containing_node(n)))
+                    nodes_dict[col].append(format_row_num_for_node_df(n.row))
                 elif col == 'nets':
                     nodes_dict[col].append(design.get_nets_containing_node_str(n))
                 else:
@@ -77,7 +76,7 @@ class DataFrameMaker:
         return pd.DataFrame(nodes_dict)
 
 
-def format_row_num_for_node_df(rows: List[Row]):
-    if not rows:
+def format_row_num_for_node_df(row: Row):
+    if row is None:
         return '-'
-    return f'{rows[0].id}'
+    return f'{row.id}'

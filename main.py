@@ -1,9 +1,11 @@
 from helpers.project_parser import Parser
-# from algos.gordian import Gordian
+from algos.gordian import Gordian
 from classes.design import Design
+from helpers.dataframes import DataFrameMaker
 from algos.swapper import Swapper, SwapType
 from frontend.visualizer import Visualizer
-from algos.legalizer import Legalizer, Tetris
+from algos.legalizer import Legalizer
+from algos.tetris import Tetris
 
 
 if __name__ == "__main__":
@@ -18,7 +20,9 @@ if __name__ == "__main__":
     tetris = Tetris(design, left_right=True)
     swapper = Swapper(design, SwapType.BEST_FIT, is_checking=True)
     legalizer = Legalizer(design)
-
+    dfm = DataFrameMaker(design)
+    # design.check_rows()
+    # print(dfm.rows_df)
     Visualizer(design=design, tetris=tetris, legalizer=legalizer, swapper=swapper).run()
 
     # overlapping_pairs = Legalizer.check_for_overlaps(design.c_nodes)
