@@ -103,7 +103,7 @@ class Visualizer:
         design: Design = parser.parse_design()
         self.design = design
         self.tetris = Tetris(design, *tetris_variant)
-        self.swapper = Swapper(design, 0)
+        self.swapper = Swapper(design, 0, True)
         self.delay = 50
         self.run_tetris = False
         self.run_swapper = False
