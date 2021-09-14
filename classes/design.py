@@ -1,4 +1,5 @@
 from classes.net import Net
+from helpers.dataframes import DataFrameMaker
 from classes.node import Node
 from classes.row import Row
 from typing import List, Set, Iterator
@@ -27,6 +28,15 @@ class Design:
         self.total_cell_area: float = sum(n.width * n.height for n in self.nodes)
         self.density: float = (self.total_area - self.total_cell_area) / self.total_area * 100
         self.initial_cable_needed = self.find_cable_needed()
+
+        self.dfm: DataFrameMaker = DataFrameMaker(self)
+
+    def get_dfs(self):
+        self.update_dfm()
+        return self.dfm.get_dfs()
+
+    def update_dfm(self):
+        self.dfm: DataFrameMaker = DataFrameMaker(self)
 
     def get_nets_in_row_str(self, row) -> str:
         nets = []

@@ -117,7 +117,7 @@ class Gordian:
 
     @staticmethod
     def __print_qp_output(level: int, cells_pos):
-        print(f"{level} QP formulation.")
+        print(f"\n{level} QP formulation.")
         print(f"x positions of cells: \n{Fore.GREEN}{cells_pos[0]}{Fore.RESET}\ny positions of cells: \n{Fore.MAGENTA}{cells_pos[1]}{Fore.RESET}")
 
     def run_example(self):

@@ -7,7 +7,7 @@ class Net:
     def __init__(self, id_: int, nodes_names: List[str]):
         self.id = id_
         self.nodes_names = nodes_names
-        self.nodes: List[Node] = list()
+        self.nodes: List[Node] = []
         self.net_degree = len(nodes_names)
         self.semiperimeter: Union[float, None] = None
 

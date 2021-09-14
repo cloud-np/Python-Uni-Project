@@ -1,4 +1,5 @@
 from typing import Union, Tuple
+import pandas as pd
 from helpers.common_classes import Rectangular
 # from classes.row import Row
 import random
@@ -27,13 +28,19 @@ class Node:
         self.og_color: Tuple[int] = self.color
         self.is_terminal: bool = name[0] == 'p'
         self.row = None
+        self.df = None
 
-    def set_position(self, x: int, y: int):
+    def set_position(self, x: int, y: int) -> None:
         if self.is_terminal is True and self.x is not None:
             raise Exception(f"You have already set a position for this terminal node!! {self}")
         self.x = x
         self.y = y
         self.rectan = Rectangular(x, y, self.width, self.height)
+        self.update_df()
+
+    def update_df(self) -> None:
+        if self.df is not None:
+            self.df.update({'x': self.x, 'y': self.y})
 
     def get_key(self):
         return tuple([self.gid, self.name])
