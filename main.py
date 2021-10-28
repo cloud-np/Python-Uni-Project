@@ -15,7 +15,7 @@ if __name__ == "__main__":
     design: Design = parser.parse_design()
     print(design.dfm)
     # Gordian(design=design, load_example=False).run()
-    # Gordian(design=design, load_example=True).run()
+    Gordian(design=design, load_example=True).run()
 
     # Auto run
     # tetris = Tetris(design, left_right=False, lower_cable_usage=False).run()
@@ -27,6 +27,6 @@ if __name__ == "__main__":
 
     Visualizer(design=design, tetris=tetris, legalizer=legalizer, swapper=swapper).run()
 
-    for df in design.get_dfs():
-        print(df, end="\n\n")
+    # for df in design.get_dfs():
+    #     print(df, end="\n\n")
     # overlapping_pairs = Legalizer.check_for_overlaps(design.c_nodes)

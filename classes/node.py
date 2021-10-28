@@ -1,5 +1,4 @@
 from typing import Union, Tuple
-import pandas as pd
 from helpers.common_classes import Rectangular
 # from classes.row import Row
 import random
